@@ -17,6 +17,7 @@ export function UpdateProjectForm() {
   const router = useRouter();
   const [file, setFile] = React.useState<File | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   const onDrop = React.useCallback((accepted: File[]) => {
     if (accepted[0]) setFile(accepted[0]);
@@ -41,6 +42,7 @@ export function UpdateProjectForm() {
     const wikiPageName = String(fd.get("wikiPageName") || "");
 
     try {
+      setError(null);
       const body = new FormData();
       body.append(
         "payload",
@@ -64,9 +66,11 @@ export function UpdateProjectForm() {
           router.push(`/progress/${data.id}`);
         }
       } else {
+        setError(data.error || `Error ${res.status}: ${res.statusText}`);
         setSubmitting(false);
       }
-    } catch {
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error de red");
       setSubmitting(false);
     }
   };
@@ -166,6 +170,13 @@ export function UpdateProjectForm() {
             />
           </Field>
         </FormSection>
+
+        {error && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+            <p className="font-medium">Error al crear el job</p>
+            <p className="mt-1 text-xs opacity-80">{error}</p>
+          </div>
+        )}
 
         <div className="flex items-center justify-end gap-3">
           <Button type="submit" size="lg" disabled={submitting || !file}>

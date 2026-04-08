@@ -27,6 +27,7 @@ export function NewProjectForm() {
   const { t } = useI18n();
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const [modules, setModules] = React.useState<Record<string, boolean>>({});
 
   const toggleModule = (key: string) =>
@@ -58,6 +59,7 @@ export function NewProjectForm() {
     };
 
     try {
+      setError(null);
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -71,9 +73,11 @@ export function NewProjectForm() {
           router.push(`/progress/${data.id}`);
         }
       } else {
+        setError(data.error || `Error ${res.status}: ${res.statusText}`);
         setSubmitting(false);
       }
-    } catch {
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error de red");
       setSubmitting(false);
     }
   };
@@ -263,6 +267,13 @@ export function NewProjectForm() {
             />
           </Field>
         </FormSection>
+
+        {error && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+            <p className="font-medium">Error al crear el job</p>
+            <p className="mt-1 text-xs opacity-80">{error}</p>
+          </div>
+        )}
 
         <div className="flex items-center justify-end gap-3">
           <Button type="submit" size="lg" disabled={submitting}>
