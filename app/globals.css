@@ -1,0 +1,186 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Orisha Agrifood — Light */
+  --background: oklch(0.99 0.004 290);
+  --foreground: oklch(0.22 0.13 290);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.13 290);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.13 290);
+  --primary: oklch(0.32 0.18 290);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0.01 290);
+  --secondary-foreground: oklch(0.26 0.14 290);
+  --muted: oklch(0.96 0.008 290);
+  --muted-foreground: oklch(0.5 0.04 290);
+  --accent: oklch(0.94 0.025 300);
+  --accent-foreground: oklch(0.28 0.15 290);
+  --destructive: oklch(0.6 0.23 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.9 0.012 290);
+  --input: oklch(0.92 0.01 290);
+  --ring: oklch(0.55 0.22 305);
+  --radius: 0.75rem;
+
+  /* Brand gradient stops (amarillo → naranja → magenta) */
+  --brand-amber: oklch(0.85 0.17 85);
+  --brand-orange: oklch(0.72 0.19 50);
+  --brand-pink: oklch(0.68 0.25 5);
+  --brand-magenta: oklch(0.58 0.26 345);
+  --brand-purple: oklch(0.32 0.18 290);
+  --brand-purple-2: oklch(0.45 0.22 295);
+}
+
+.dark {
+  /* Orisha Agrifood — Dark */
+  --background: oklch(0.12 0.025 290);
+  --foreground: oklch(0.97 0.005 290);
+  --card: oklch(0.17 0.03 290);
+  --card-foreground: oklch(0.97 0.005 290);
+  --popover: oklch(0.17 0.03 290);
+  --popover-foreground: oklch(0.97 0.005 290);
+  --primary: oklch(0.72 0.2 305);
+  --primary-foreground: oklch(0.14 0.025 290);
+  --secondary: oklch(0.22 0.035 290);
+  --secondary-foreground: oklch(0.97 0.005 290);
+  --muted: oklch(0.22 0.03 290);
+  --muted-foreground: oklch(0.7 0.025 290);
+  --accent: oklch(0.28 0.06 300);
+  --accent-foreground: oklch(0.97 0.005 290);
+  --destructive: oklch(0.62 0.23 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.28 0.035 290);
+  --input: oklch(0.3 0.035 290);
+  --ring: oklch(0.72 0.2 305);
+
+  --brand-amber: oklch(0.85 0.17 85);
+  --brand-orange: oklch(0.75 0.19 50);
+  --brand-pink: oklch(0.7 0.25 5);
+  --brand-magenta: oklch(0.62 0.26 345);
+  --brand-purple: oklch(0.45 0.2 295);
+  --brand-purple-2: oklch(0.72 0.2 305);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-amber: var(--brand-amber);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-magenta: var(--brand-magenta);
+  --color-brand-purple: var(--brand-purple);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  html,
+  body {
+    min-height: 100%;
+  }
+}
+
+@layer utilities {
+  .bg-grid {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      color-mix(in oklch, var(--foreground) 8%, transparent) 1px,
+      transparent 0
+    );
+    background-size: 28px 28px;
+  }
+
+  .bg-orisha-hero {
+    background:
+      radial-gradient(
+        ellipse 80% 60% at 50% 0%,
+        color-mix(in oklch, var(--brand-magenta) 18%, transparent) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 60% 50% at 20% 100%,
+        color-mix(in oklch, var(--brand-purple-2) 25%, transparent) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 50% 40% at 85% 80%,
+        color-mix(in oklch, var(--brand-orange) 15%, transparent) 0%,
+        transparent 60%
+      );
+  }
+
+  .text-brand-gradient {
+    background: linear-gradient(
+      110deg,
+      var(--brand-amber) 0%,
+      var(--brand-orange) 35%,
+      var(--brand-pink) 65%,
+      var(--brand-magenta) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .bg-brand-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--brand-amber) 0%,
+      var(--brand-orange) 40%,
+      var(--brand-magenta) 100%
+    );
+  }
+
+  .ring-brand {
+    box-shadow:
+      0 0 0 1px color-mix(in oklch, var(--brand-magenta) 40%, transparent),
+      0 8px 40px -12px color-mix(in oklch, var(--brand-magenta) 50%, transparent);
+  }
+
+  .border-brand-gradient {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--card), var(--card)) padding-box,
+      linear-gradient(
+          135deg,
+          var(--brand-amber),
+          var(--brand-orange),
+          var(--brand-magenta)
+        )
+        border-box;
+  }
+}

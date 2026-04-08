@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" fill="none">
+  <defs>
+    <linearGradient id="swSparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="45%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="swRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="27" stroke="url(#swRing)" stroke-width="3" fill="none"/>
+  <path d="M32 12 L35.5 26.5 L50 30 L35.5 33.5 L32 48 L28.5 33.5 L14 30 L28.5 26.5 Z"
+        fill="url(#swSparkle)"/>
+  <text x="74" y="44"
+        font-family="Inter, system-ui, sans-serif"
+        font-size="38"
+        font-weight="700"
+        letter-spacing="-0.5"
+        fill="currentColor">Scout</text>
+</svg>

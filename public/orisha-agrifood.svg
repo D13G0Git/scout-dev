@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 120" fill="none">
+  <defs>
+    <linearGradient id="orishaS" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="35%" stop-color="#F97316"/>
+      <stop offset="70%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#BE185D"/>
+    </linearGradient>
+  </defs>
+  <g font-family="Inter, system-ui, sans-serif">
+    <!-- ORI -->
+    <text x="0" y="70"
+          font-size="72"
+          font-weight="800"
+          letter-spacing="2"
+          fill="currentColor">ORI</text>
+    <!-- S with gradient -->
+    <text x="143" y="70"
+          font-size="72"
+          font-weight="800"
+          letter-spacing="2"
+          fill="url(#orishaS)">S</text>
+    <!-- HA -->
+    <text x="192" y="70"
+          font-size="72"
+          font-weight="800"
+          letter-spacing="2"
+          fill="currentColor">HA</text>
+    <!-- Agrifood -->
+    <text x="190" y="102"
+          font-size="24"
+          font-weight="500"
+          letter-spacing="1.5"
+          fill="currentColor">Agrifood</text>
+  </g>
+</svg>
