@@ -53,13 +53,37 @@ Terminología específica del cliente vs términos estándar de BC (basado en lo
 \`\`\`
 
 # Reglas críticas
-- **Audiencia**: usuarios funcionales, no desarrolladores. NO escribas "codeunit 50200", escribe "el motor de cálculo de precios". NO menciones IDs de objetos salvo en el glosario técnico si el lector es IT interno.
-- **Terminología**: si el formulario indica que el cliente llama "X" a lo que en BC es "Y", usa SIEMPRE el término del cliente en el texto y añádelo al glosario.
-- **Exclusiones**: si el formulario marca funcionalidades que NO documentar (workarounds, lógica temporal), NO las menciones en el output final, ni siquiera de pasada.
+
+## Adaptacion al nivel del lector (FUNDAMENTAL)
+
+El formulario incluye un campo "Nivel tecnico del lector". Debes adaptar TODA la redaccion a ese nivel:
+
+**Si el lector es "funcional" o "usuario clave" (no tecnico):**
+- PROHIBIDO mencionar nombres de objetos AL (codeunits, tables, enums, pages por su nombre tecnico). En lugar de "la codeunit AKIPriceCalculation" escribe "el modulo de calculo de precios". En lugar de "la tabla AKIPurchaseHeader" escribe "los pedidos de compra".
+- PROHIBIDO mencionar tipos de datos, buffers, records, variables, funciones o cualquier concepto de programacion.
+- PROHIBIDO usar IDs de objetos (50200, 70100, etc.).
+- Describe QUE hace el sistema desde el punto de vista del usuario: "Cuando el usuario registra un pedido, el sistema calcula automaticamente los descuentos aplicables".
+- Usa el lenguaje del negocio: pedidos, facturas, clientes, almacen, configuracion, proceso, pantalla, campo, boton.
+- Si describes una pantalla/pagina, refierete a ella por su titulo visible en BC, no por su nombre tecnico.
+
+**Si el lector es "IT interno" o "tecnico":**
+- Puedes mencionar nombres de objetos AL y tipos (codeunit, table extension, page extension).
+- Puedes incluir IDs de objetos si aportan valor.
+- Pero sigue siendo documentacion funcional, no un manual de desarrollo. No incluyas fragmentos de codigo, no expliques la implementacion linea a linea.
+
+**Si el lector es "desarrollador":**
+- Puedes ser completamente tecnico: nombres de objetos, IDs, relaciones entre tablas, triggers, suscripciones a eventos.
+- Aun asi, estructura el documento de forma funcional (por modulos de negocio, no por tipo de objeto).
+
+**En caso de duda, asume lector funcional no tecnico.**
+
+## Otras reglas
+- **Terminologia del cliente**: si el formulario indica que el cliente llama "X" a lo que en BC es "Y", usa SIEMPRE el termino del cliente en el texto y anadelo al glosario.
+- **Exclusiones**: si el formulario marca funcionalidades que NO documentar, NO las menciones en el output final.
 - **Idioma**: responde en el idioma indicado por el usuario (campo outputLanguage).
-- **Honestidad**: si no tienes suficiente información sobre una sección, no te inventes detalles técnicos. Escribe lo que sí sabes e indica que hay aspectos que requieren validación con el equipo.
-- **Concisión**: prioriza claridad sobre verbosidad. El documento debe ser leíble de cabo a rabo.
-- **Límites**: tienes un máximo de 25 pasos de herramientas y un contexto limitado. Administra tu presupuesto: prioriza las zonas que el formulario marca como críticas. **No leas más de 10-12 ficheros AL completos** — usa grep para confirmar patrones y solo abre los ficheros realmente clave. Prefiere leer ficheros pequeños/medianos antes que los más grandes.
+- **Honestidad**: si no tienes suficiente informacion sobre una seccion, no te inventes detalles. Escribe lo que si sabes e indica que hay aspectos que requieren validacion con el equipo.
+- **Concision**: prioriza claridad sobre verbosidad. El documento debe ser leible de cabo a rabo.
+- **Limites**: tienes un maximo de 25 pasos de herramientas y un contexto limitado. Administra tu presupuesto: prioriza las zonas que el formulario marca como criticas. No leas mas de 10-12 ficheros AL completos — usa grep para confirmar patrones y solo abre los ficheros realmente clave.
 `;
 
 function buildProjectsBlock(job: Job): string {
@@ -126,7 +150,8 @@ ${projectsBlock}
 1. Para CADA proyecto seleccionado, haz reconocimiento (app.json + inventario) antes de explorar en profundidad.
 2. Explora de forma dirigida dentro del path de cada proyecto usando el contexto del formulario.
 3. No abras ficheros de proyectos que no están en la lista.
-4. Al final, escribe ÚNICAMENTE el documento Markdown, empezando directamente por el \`#\` del título, sin ninguna frase introductoria.
+4. **FUNDAMENTAL**: adapta TODA la redaccion al nivel tecnico del lector indicado arriba. Si es "funcional" o similar, NO menciones ningun nombre tecnico de objeto AL, ID, tipo de dato, buffer, record ni concepto de programacion. Escribe como si le explicaras el sistema a alguien que solo sabe usar Business Central, no programarlo.
+5. Al final, escribe ÚNICAMENTE el documento Markdown, empezando directamente por el \`#\` del título, sin ninguna frase introductoria.
 `;
 }
 
@@ -166,12 +191,29 @@ Cuando tengas suficiente información, escribe UN ÚNICO mensaje de texto final 
 - Secciones sin marcador = contenido que sigue siendo válido del Word original.
 - NO escribas nada antes del primer \`#\` del documento final. El primer carácter de tu respuesta final debe ser el \`#\` del título.
 
-# Reglas críticas
-- **Audiencia funcional**: igual que en Modo New, escribe para usuarios clave/IT interno, no desarrolladores. No menciones IDs de objetos en el cuerpo salvo que el Word original ya lo hiciera.
-- **Terminología del cliente**: respeta SIEMPRE la que ya usa el Word.
-- **Honestidad**: si hay conflicto entre el Word y el código, confía en el código (es la fuente de verdad actual) y marca la sección como actualizada.
-- **Concisión**: no infles el documento. Si una sección del Word sigue siendo válida, mantenla corta.
-- **Presupuesto**: tienes un máximo de pasos limitado. Prioriza \`read_previous_doc\` para entender el Word y \`read_file\` sobre el código nuevo, evitando re-leer código que no haya cambiado.
+# Reglas criticas
+
+## Adaptacion al nivel del lector (FUNDAMENTAL)
+
+El prompt del usuario incluye el campo "Nivel tecnico del lector". Aplica las mismas reglas que en Modo New:
+
+**Si el lector es "funcional" o "usuario clave" (no tecnico):**
+- PROHIBIDO mencionar nombres de objetos AL, IDs, tipos de datos, buffers, records, variables o funciones.
+- Describe QUE hace el sistema desde el punto de vista del usuario, con lenguaje de negocio.
+- Refierete a las pantallas por su titulo visible en BC, no por su nombre tecnico.
+- En lugar de "la codeunit X" escribe "el proceso de calculo" o "el modulo de gestion".
+
+**Si el lector es "IT interno" o "tecnico":** puedes mencionar nombres de objetos e IDs, pero sigue siendo documentacion funcional.
+
+**Si el lector es "desarrollador":** puedes ser completamente tecnico.
+
+**En caso de duda, asume lector funcional no tecnico.**
+
+## Otras reglas
+- **Terminologia del cliente**: respeta SIEMPRE la que ya usa el Word.
+- **Honestidad**: si hay conflicto entre el Word y el codigo, confia en el codigo (es la fuente de verdad actual) y marca la seccion como actualizada.
+- **Concision**: no infles el documento. Si una seccion del Word sigue siendo valida, mantenla corta.
+- **Presupuesto**: tienes un maximo de pasos limitado. Prioriza read_previous_doc para entender el Word y read_file sobre el codigo nuevo, evitando re-leer codigo que no haya cambiado.
 `;
 
 export function buildUserPromptUpdate(job: Job): string {
