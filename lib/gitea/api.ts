@@ -4,16 +4,22 @@
  * The agent reads files from a local clone — not via the REST API.
  */
 
-import https from "node:https";
+import { Agent } from "undici";
+
+const _insecureAgent = new Agent({ connect: { rejectUnauthorized: false } });
 
 /**
  * Custom fetch wrapper that disables SSL verification when GIT_SSL_NO_VERIFY=true.
  * Required for self-signed or untrusted certificates on Gitea instances.
+ * Uses undici dispatcher which is what Node.js built-in fetch actually uses.
  */
 function giteaFetch(url: string, init?: RequestInit): Promise<Response> {
   if (process.env.GIT_SSL_NO_VERIFY === "true") {
-    const agent = new https.Agent({ rejectUnauthorized: false });
-    return fetch(url, { ...init, agent } as RequestInit);
+    return fetch(url, {
+      ...init,
+      // @ts-expect-error -- Node.js fetch accepts undici dispatcher
+      dispatcher: _insecureAgent,
+    });
   }
   return fetch(url, init);
 }
