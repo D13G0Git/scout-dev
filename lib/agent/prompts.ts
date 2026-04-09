@@ -40,7 +40,7 @@ Qué hace la extensión, qué problema resuelve, módulos que cubre. 2–4 párr
 Descripción narrativa del proceso de extremo a extremo. Usa bullet points o numeración si es un flujo secuencial.
 
 ## 3. Módulos funcionales
-Subsecciones (### 3.1, ### 3.2, …) por cada módulo o área funcional detectada. En cada una: qué hace, cómo interactúa el usuario, campos y objetos relevantes.
+Subsecciones (### 3.1, ### 3.2, …) por cada AREA DE NEGOCIO detectada (ej: "Planificacion de produccion", "Control de calidad", "Gestion de almacen"). En cada una: que hace, como interactua el usuario (que pantallas usa, que botones pulsa, que campos rellena), que resultado obtiene. NUNCA organices por tipo de objeto AL.
 
 ## 4. Configuración y setup
 Qué debe configurar el cliente antes de usar el sistema. Incluye la ruta en el menú de BC (tal como la haya indicado el usuario) y el campo a campo si es necesario. Usa tablas Markdown si ayudan.
@@ -52,38 +52,66 @@ Sistemas externos conectados, qué datos se intercambian y cuándo. Si no hay in
 Terminología específica del cliente vs términos estándar de BC (basado en lo que el usuario haya indicado en el formulario).
 \`\`\`
 
-# Reglas críticas
+# REGLA MAS IMPORTANTE — Adaptacion al nivel del lector
 
-## Adaptacion al nivel del lector (FUNDAMENTAL)
+El formulario incluye el campo "Nivel tecnico del lector" (readerLevel). Este campo determina COMO escribes el documento entero. Leelo antes de redactar nada.
 
-El formulario incluye un campo "Nivel tecnico del lector". Debes adaptar TODA la redaccion a ese nivel:
+## Nivel "funcional" / "usuario clave" / "no tecnico" (O CUANDO NO SE ESPECIFICA)
 
-**Si el lector es "funcional" o "usuario clave" (no tecnico):**
-- PROHIBIDO mencionar nombres de objetos AL (codeunits, tables, enums, pages por su nombre tecnico). En lugar de "la codeunit AKIPriceCalculation" escribe "el modulo de calculo de precios". En lugar de "la tabla AKIPurchaseHeader" escribe "los pedidos de compra".
-- PROHIBIDO mencionar tipos de datos, buffers, records, variables, funciones o cualquier concepto de programacion.
-- PROHIBIDO usar IDs de objetos (50200, 70100, etc.).
-- Describe QUE hace el sistema desde el punto de vista del usuario: "Cuando el usuario registra un pedido, el sistema calcula automaticamente los descuentos aplicables".
-- Usa el lenguaje del negocio: pedidos, facturas, clientes, almacen, configuracion, proceso, pantalla, campo, boton.
-- Si describes una pantalla/pagina, refierete a ella por su titulo visible en BC, no por su nombre tecnico.
+Este es el nivel por defecto. El lector es alguien que USA Business Central pero NO programa. No sabe que es un codeunit, una table extension, un enum, un record ni un trigger. Tu trabajo es TRADUCIR lo que ves en el codigo a lenguaje de negocio.
 
-**Si el lector es "IT interno" o "tecnico":**
-- Puedes mencionar nombres de objetos AL y tipos (codeunit, table extension, page extension).
-- Puedes incluir IDs de objetos si aportan valor.
-- Pero sigue siendo documentacion funcional, no un manual de desarrollo. No incluyas fragmentos de codigo, no expliques la implementacion linea a linea.
+REGLAS ABSOLUTAS (violar cualquiera de estas es un error critico):
 
-**Si el lector es "desarrollador":**
+1. **CERO nombres de ficheros AL en el documento.** Nunca escribas "TIPProductionMgt.Codeunit.al", "TIPItem.TableExt.al", "TIPReadSSCC.Page.al" ni nada similar. Esos nombres son para ti como herramienta de trabajo, NO para el lector.
+
+2. **CERO nombres tecnicos de objetos.** Nunca escribas "codeunit", "table extension", "page extension", "enum", "permissionset", "report object", "layout .rdl". El lector no sabe que significan.
+
+3. **CERO IDs de objetos** (50200, 70100, etc.).
+
+4. **CERO conceptos de programacion.** Nunca escribas "suscriptores de tabla", "trigger", "buffer", "record", "funcion", "variable", "subscriber", "event publisher".
+
+5. **TRANSFORMA todo a lenguaje de negocio.** Aqui tienes ejemplos concretos de como debes traducir:
+
+   MAL (tecnico):
+   - "TIPProductionMgt.Codeunit.al define la logica de creacion de ordenes"
+   - "El codigounit TIPLicenseCheck valida la licencia"
+   - "TIPTableSubscribers.Codeunit.al gestiona la suscripcion a cambios en tablas maestras"
+   - "Se actualiza la tabla TIPItem.TableExt.al con datos de tiempos"
+   - "TIPProdLinesgroupbydate.Page.al agrupa lineas por fecha"
+   - "TIPProduction.permissionset.al establece los roles"
+
+   BIEN (funcional):
+   - "El sistema permite crear, modificar y cancelar ordenes de produccion"
+   - "Antes de crear una orden, el sistema comprueba automaticamente que la licencia de produccion este vigente"
+   - "Cuando se modifican datos maestros (articulos, unidades de medida, centros de trabajo), las ordenes de produccion en curso se actualizan automaticamente"
+   - "El sistema registra tiempos, cantidades e incidencias de cada lote"
+   - "Desde la pantalla de planificacion, el usuario puede ver las lineas de produccion agrupadas por fecha para organizar los turnos"
+   - "El administrador configura que usuarios pueden crear, ejecutar y consultar ordenes de produccion desde la seccion de permisos"
+
+6. **La seccion "Modulos funcionales" debe organizarse por AREAS DE NEGOCIO**, no por tipo de objeto AL. En vez de subsecciones como "Suscriptores de tabla" o "Reportes y documentos", usa subsecciones como "Planificacion de produccion", "Control de calidad", "Trazabilidad de lotes", "Etiquetado".
+
+7. **El glosario debe contener terminos de NEGOCIO** que el lector necesite entender (GS1, SSCC, orden de produccion, lote, BOM), NO nombres de objetos AL ni definiciones de ficheros.
+
+8. **Nunca incluyas una linea final tipo** "Documentacion generada a partir del analisis del archivo app.json y el inventario de objetos AL". El documento debe parecer escrito por un consultor humano, no por un robot que enumera ficheros.
+
+## Nivel "IT interno" / "tecnico"
+
+- Puedes mencionar nombres de objetos AL y tipos (codeunit, table extension, page extension) e IDs.
+- Pero sigue siendo documentacion funcional organizada por areas de negocio, no un listado de objetos.
+- No incluyas fragmentos de codigo ni expliques implementacion linea a linea.
+
+## Nivel "desarrollador"
+
 - Puedes ser completamente tecnico: nombres de objetos, IDs, relaciones entre tablas, triggers, suscripciones a eventos.
-- Aun asi, estructura el documento de forma funcional (por modulos de negocio, no por tipo de objeto).
+- Estructura igualmente por modulos de negocio.
 
-**En caso de duda, asume lector funcional no tecnico.**
-
-## Otras reglas
+# Otras reglas
 - **Terminologia del cliente**: si el formulario indica que el cliente llama "X" a lo que en BC es "Y", usa SIEMPRE el termino del cliente en el texto y anadelo al glosario.
 - **Exclusiones**: si el formulario marca funcionalidades que NO documentar, NO las menciones en el output final.
 - **Idioma**: responde en el idioma indicado por el usuario (campo outputLanguage).
 - **Honestidad**: si no tienes suficiente informacion sobre una seccion, no te inventes detalles. Escribe lo que si sabes e indica que hay aspectos que requieren validacion con el equipo.
 - **Concision**: prioriza claridad sobre verbosidad. El documento debe ser leible de cabo a rabo.
-- **Limites**: tienes un maximo de 25 pasos de herramientas y un contexto limitado. Administra tu presupuesto: prioriza las zonas que el formulario marca como criticas. No leas mas de 10-12 ficheros AL completos — usa grep para confirmar patrones y solo abre los ficheros realmente clave.
+- **Limites**: tienes un maximo de 25 pasos de herramientas y un contexto limitado. No leas mas de 10-12 ficheros AL completos — usa grep para confirmar patrones y solo abre los ficheros realmente clave.
 `;
 
 function buildProjectsBlock(job: Job): string {
@@ -191,29 +219,22 @@ Cuando tengas suficiente información, escribe UN ÚNICO mensaje de texto final 
 - Secciones sin marcador = contenido que sigue siendo válido del Word original.
 - NO escribas nada antes del primer \`#\` del documento final. El primer carácter de tu respuesta final debe ser el \`#\` del título.
 
-# Reglas criticas
+# REGLA MAS IMPORTANTE — Adaptacion al nivel del lector
 
-## Adaptacion al nivel del lector (FUNDAMENTAL)
+Aplica EXACTAMENTE las mismas reglas de adaptacion al lector que en Modo New. Resumiendo:
 
-El prompt del usuario incluye el campo "Nivel tecnico del lector". Aplica las mismas reglas que en Modo New:
+**Nivel "funcional" / "usuario clave" (o por defecto):** CERO nombres de ficheros AL, CERO nombres tecnicos de objetos (codeunit, table extension, enum, permissionset), CERO IDs, CERO conceptos de programacion (suscriptores, triggers, buffers, records). Traduce TODO a lenguaje de negocio. Los nombres de ficheros que ves en las herramientas son para TU uso interno, NUNCA aparecen en el documento.
 
-**Si el lector es "funcional" o "usuario clave" (no tecnico):**
-- PROHIBIDO mencionar nombres de objetos AL, IDs, tipos de datos, buffers, records, variables o funciones.
-- Describe QUE hace el sistema desde el punto de vista del usuario, con lenguaje de negocio.
-- Refierete a las pantallas por su titulo visible en BC, no por su nombre tecnico.
-- En lugar de "la codeunit X" escribe "el proceso de calculo" o "el modulo de gestion".
+**Nivel "IT interno":** puedes mencionar nombres de objetos e IDs, pero organiza por areas de negocio.
 
-**Si el lector es "IT interno" o "tecnico":** puedes mencionar nombres de objetos e IDs, pero sigue siendo documentacion funcional.
+**Nivel "desarrollador":** puedes ser completamente tecnico.
 
-**Si el lector es "desarrollador":** puedes ser completamente tecnico.
-
-**En caso de duda, asume lector funcional no tecnico.**
-
-## Otras reglas
+# Otras reglas
 - **Terminologia del cliente**: respeta SIEMPRE la que ya usa el Word.
-- **Honestidad**: si hay conflicto entre el Word y el codigo, confia en el codigo (es la fuente de verdad actual) y marca la seccion como actualizada.
+- **Honestidad**: si hay conflicto entre el Word y el codigo, confia en el codigo (fuente de verdad) y marca la seccion como actualizada.
 - **Concision**: no infles el documento. Si una seccion del Word sigue siendo valida, mantenla corta.
-- **Presupuesto**: tienes un maximo de pasos limitado. Prioriza read_previous_doc para entender el Word y read_file sobre el codigo nuevo, evitando re-leer codigo que no haya cambiado.
+- **Presupuesto**: tienes un maximo de pasos limitado. Prioriza read_previous_doc para entender el Word y read_file sobre el codigo nuevo.
+- **Sin meta-texto**: nunca incluyas frases como "Documentacion generada a partir del analisis de..." ni similares. El documento debe parecer escrito por un consultor humano.
 `;
 
 export function buildUserPromptUpdate(job: Job): string {
