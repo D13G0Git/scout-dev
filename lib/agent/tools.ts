@@ -11,9 +11,9 @@ import type { DocxHeading } from "@/lib/parsers/word";
  * Any attempt to escape the sandbox throws before touching disk.
  */
 
-const MAX_FILE_BYTES = 200 * 1024; // 200 KB
-const MAX_GREP_RESULTS = 50;
-const MAX_LIST_ENTRIES = 500;
+const MAX_FILE_BYTES = 80 * 1024; // 80 KB — reduced to stay within model context limits
+const MAX_GREP_RESULTS = 30;
+const MAX_LIST_ENTRIES = 200;
 const SEARCHABLE_EXTENSIONS = new Set([".al", ".json", ".md", ".xml"]);
 const IGNORED_DIRS = new Set([
   "node_modules",
@@ -200,7 +200,7 @@ export function buildAgentTools(ctx: AgentToolContext) {
         path: relPath,
         bytes: buf.length,
         truncated,
-        content: truncated ? text + "\n\n... [truncated at 200KB]" : text,
+        content: truncated ? text + "\n\n... [truncated at 80KB]" : text,
       };
     },
   });

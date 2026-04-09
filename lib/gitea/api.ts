@@ -4,6 +4,20 @@
  * The agent reads files from a local clone — not via the REST API.
  */
 
+import https from "node:https";
+
+/**
+ * Custom fetch wrapper that disables SSL verification when GIT_SSL_NO_VERIFY=true.
+ * Required for self-signed or untrusted certificates on Gitea instances.
+ */
+function giteaFetch(url: string, init?: RequestInit): Promise<Response> {
+  if (process.env.GIT_SSL_NO_VERIFY === "true") {
+    const agent = new https.Agent({ rejectUnauthorized: false });
+    return fetch(url, { ...init, agent } as RequestInit);
+  }
+  return fetch(url, init);
+}
+
 export interface GiteaRepoMeta {
   owner: string;
   name: string;
@@ -48,7 +62,7 @@ export function parseRepoUrl(repoUrl: string): { owner: string; name: string } {
 
 export async function getRepoMeta(repoUrl: string): Promise<GiteaRepoMeta> {
   const { owner, name } = parseRepoUrl(repoUrl);
-  const res = await fetch(`${getBaseUrl()}/api/v1/repos/${owner}/${name}`, {
+  const res = await giteaFetch(`${getBaseUrl()}/api/v1/repos/${owner}/${name}`, {
     headers: headers(),
   });
   if (!res.ok) {
@@ -79,13 +93,13 @@ export async function upsertWikiPage(
   const pageName = title.replace(/\s+/g, "-");
 
   // Check if page already exists
-  const checkRes = await fetch(`${apiBase}/page/${encodeURIComponent(pageName)}`, {
+  const checkRes = await giteaFetch(`${apiBase}/page/${encodeURIComponent(pageName)}`, {
     headers: headers(),
   });
 
   if (checkRes.ok) {
     // Update existing page
-    const patchRes = await fetch(`${apiBase}/page/${encodeURIComponent(pageName)}`, {
+    const patchRes = await giteaFetch(`${apiBase}/page/${encodeURIComponent(pageName)}`, {
       method: "PATCH",
       headers: headers(),
       body: JSON.stringify({
@@ -99,7 +113,7 @@ export async function upsertWikiPage(
     }
   } else {
     // Create new page
-    const postRes = await fetch(`${apiBase}/new`, {
+    const postRes = await giteaFetch(`${apiBase}/new`, {
       method: "POST",
       headers: headers(),
       body: JSON.stringify({

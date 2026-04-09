@@ -59,7 +59,7 @@ Terminología específica del cliente vs términos estándar de BC (basado en lo
 - **Idioma**: responde en el idioma indicado por el usuario (campo outputLanguage).
 - **Honestidad**: si no tienes suficiente información sobre una sección, no te inventes detalles técnicos. Escribe lo que sí sabes e indica que hay aspectos que requieren validación con el equipo.
 - **Concisión**: prioriza claridad sobre verbosidad. El documento debe ser leíble de cabo a rabo.
-- **Límites**: tienes un máximo de 25 pasos de herramientas. Administra tu presupuesto: prioriza las zonas que el formulario marca como críticas.
+- **Límites**: tienes un máximo de 25 pasos de herramientas y un contexto limitado. Administra tu presupuesto: prioriza las zonas que el formulario marca como críticas. **No leas más de 10-12 ficheros AL completos** — usa grep para confirmar patrones y solo abre los ficheros realmente clave. Prefiere leer ficheros pequeños/medianos antes que los más grandes.
 `;
 
 function buildProjectsBlock(job: Job): string {

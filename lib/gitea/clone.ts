@@ -35,8 +35,9 @@ export async function cloneRepoTemp(repoUrl: string): Promise<string> {
   const dir = path.join(TEMP_BASE(), randomUUID());
   await fs.mkdir(dir, { recursive: true });
 
-  const git = simpleGit();
-  await git.clone(authedUrl, dir, ["--depth", "1"]);
+  const sslVerify = process.env.GIT_SSL_NO_VERIFY === "true" ? "false" : "true";
+  const git = simpleGit().env("GIT_SSL_NO_VERIFY", sslVerify === "false" ? "1" : "");
+  await git.clone(authedUrl, dir, ["-c", `http.sslVerify=${sslVerify}`, "--depth", "1"]);
 
   return dir;
 }

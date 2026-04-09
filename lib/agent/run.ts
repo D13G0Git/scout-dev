@@ -19,7 +19,7 @@ export interface RunAgentOptions {
   rootPath: string;
 }
 
-const MAX_STEPS_DEFAULT = 60;
+const MAX_STEPS_DEFAULT = 35;
 
 function stripPreamble(text: string): string {
   const firstHeadingIdx = text.search(/^#\s+\S/m);
