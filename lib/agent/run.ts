@@ -19,7 +19,7 @@ export interface RunAgentOptions {
   rootPath: string;
 }
 
-const MAX_STEPS_DEFAULT = 35;
+const MAX_STEPS_DEFAULT = 25;
 
 function stripPreamble(text: string): string {
   const firstHeadingIdx = text.search(/^#\s+\S/m);
@@ -102,24 +102,47 @@ export async function runAgent(job: Job, opts: RunAgentOptions): Promise<string>
   let accumulatedText = "";
   let chunkCount = 0;
 
-  for await (const part of result.fullStream) {
-    if (part.type === "text-delta") {
-      accumulatedText += part.text;
-      chunkCount++;
-      // Emit a text_chunk event every ~20 chunks to show progress without
-      // flooding the SSE stream. The actual text is NOT sent (privacy + size);
-      // only a progress indicator.
-      if (chunkCount % 20 === 0) {
-        onEvent({
-          type: "text_chunk",
-          message: `Escribiendo… (${accumulatedText.length.toLocaleString()} caracteres)`,
-          progress: Math.min(97, 92 + Math.round((accumulatedText.length / 15000) * 5)),
-        });
+  try {
+    for await (const part of result.fullStream) {
+      if (part.type === "text-delta") {
+        accumulatedText += part.text;
+        chunkCount++;
+        if (chunkCount % 20 === 0) {
+          onEvent({
+            type: "text_chunk",
+            message: `Escribiendo… (${accumulatedText.length.toLocaleString()} caracteres)`,
+            progress: Math.min(97, 92 + Math.round((accumulatedText.length / 15000) * 5)),
+          });
+        }
       }
+    }
+  } catch (err) {
+    // If the model hit its context limit mid-run, salvage whatever text we got
+    const isContextOverflow =
+      err instanceof Error &&
+      (err.message.includes("prompt is too long") ||
+        err.message.includes("context_length_exceeded") ||
+        err.message.includes("maximum context length"));
+    if (isContextOverflow && accumulatedText.length > 200) {
+      onEvent({
+        type: "action",
+        message: "Contexto del modelo agotado — generando documento con la información recopilada",
+        progress: 92,
+      });
+    } else {
+      throw err;
     }
   }
 
   const finalText = stripPreamble(accumulatedText);
+
+  if (!finalText || finalText.length < 100) {
+    throw new Error(
+      "El agente no pudo generar documentación suficiente. " +
+      "El repositorio puede ser demasiado grande para el modelo configurado. " +
+      "Prueba seleccionando menos proyectos o usa un modelo con mayor contexto."
+    );
+  }
 
   onEvent({
     type: "section",

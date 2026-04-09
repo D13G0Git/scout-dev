@@ -8,7 +8,7 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
  *   OPENROUTER_API_KEY  — required to run the real agent
  *   MODEL               — optional, defaults to "z-ai/glm-4.5-air:free"
  */
-export const DEFAULT_MODEL = process.env.MODEL || "z-ai/glm-4.5-air:free";
+export const DEFAULT_MODEL = process.env.MODEL || "nvidia/nemotron-3-super-120b-a12b";
 
 let _openrouter: ReturnType<typeof createOpenRouter> | null = null;
 

@@ -11,9 +11,9 @@ import type { DocxHeading } from "@/lib/parsers/word";
  * Any attempt to escape the sandbox throws before touching disk.
  */
 
-const MAX_FILE_BYTES = 80 * 1024; // 80 KB — reduced to stay within model context limits
-const MAX_GREP_RESULTS = 30;
-const MAX_LIST_ENTRIES = 200;
+const MAX_FILE_BYTES = 40 * 1024; // 40 KB — aggressively reduced to stay within model context limits
+const MAX_GREP_RESULTS = 20;
+const MAX_LIST_ENTRIES = 150;
 const SEARCHABLE_EXTENSIONS = new Set([".al", ".json", ".md", ".xml"]);
 const IGNORED_DIRS = new Set([
   "node_modules",
@@ -200,7 +200,7 @@ export function buildAgentTools(ctx: AgentToolContext) {
         path: relPath,
         bytes: buf.length,
         truncated,
-        content: truncated ? text + "\n\n... [truncated at 80KB]" : text,
+        content: truncated ? text + "\n\n... [truncated at 40KB]" : text,
       };
     },
   });
@@ -232,7 +232,7 @@ export function buildAgentTools(ctx: AgentToolContext) {
         const lines = content.split(/\r?\n/);
         for (let i = 0; i < lines.length; i++) {
           if (regex.test(lines[i])) {
-            matches.push({ file: rel(full), line: i + 1, snippet: lines[i].trim().slice(0, 240) });
+            matches.push({ file: rel(full), line: i + 1, snippet: lines[i].trim().slice(0, 150) });
             if (matches.length >= maxResults) return false;
           }
         }

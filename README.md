@@ -1,95 +1,137 @@
-# BC Doc Generator
+# Scout DEV
 
 Herramienta web que analiza repositorios de **Business Central (AL)** alojados
-en **Gitea** y genera documentación funcional orientada al cliente, publicándola
-automáticamente en la Wiki del mismo repositorio.
+en **Gitea** y genera documentación funcional orientada al cliente final,
+publicándola automáticamente en la Wiki del mismo repositorio.
 
-## Estado actual: Fase 1 — Mockup visual navegable
+Un agente IA explora el código AL de forma incremental (lee manifiestos,
+lista ficheros, busca patrones, abre solo lo relevante) y redacta un documento
+Markdown estructurado siguiendo una metodología de consultoría funcional.
 
-Este commit contiene un esqueleto **Next.js 16 / React 19 fullstack** con UI
-definitiva, ambos modos (Nuevo / Actualizar) y **streaming SSE real** de
-eventos simulados. Toda la integración con Gitea, el parser de Word y el
-agente de Claude están presentes como _stubs_ con tipos, listos para
-implementarse en Fase 2.
+## Funcionalidades
 
-### Lo que funciona
-
-- Landing bilingüe (ES / EN) con selector de idioma y toggle de tema
-- Formulario Modo Nuevo (5 bloques: identidad, módulos, objetos clave, contexto cliente)
-- Formulario Modo Actualizar con dropzone de `.docx` (`react-dropzone`)
-- API `POST /api/jobs` crea un job en memoria
-- API `GET /api/jobs/:id/stream` emite eventos SSE con delays realistas
-- Vista `/progress/:id` consume el stream y muestra feed + barra de progreso
-- Vista `/result/:id` con preview Markdown (`react-markdown` + `remark-gfm`)
-
-### Lo que NO funciona (Fase 2)
-
-- No se llama a ningún LLM
-- No se clona ningún repo real
-- No se lee el `.docx` (se valida el upload y se descarta)
-- No se publica nada en la Wiki de Gitea
+- **Modo Nuevo** — Genera documentación desde cero a partir del código y un
+  formulario de contexto (cliente, flujo de negocio, módulos, terminología).
+- **Modo Actualizar** — Sube un `.docx` con documentación previa, el agente
+  lo compara con el estado actual del código y produce una versión fusionada
+  marcando cambios (nuevo, actualizado, eliminado).
+- **Workspace multi-proyecto** — Detecta automáticamente repositorios con
+  varios `app.json` y permite seleccionar qué proyectos documentar.
+- **Publicación en Wiki** — El documento generado se publica directamente en
+  la Wiki del repositorio Gitea.
+- **Streaming en tiempo real** — El progreso del agente (ficheros leídos,
+  búsquedas, fases) se muestra al usuario via SSE.
+- **Autenticación** — NextAuth v5 con Credentials provider y JWT.
+- **Bilingue** — Interfaz en Español e Inglés con persistencia en localStorage.
+- **Tema claro/oscuro** — Toggle con persistencia.
 
 ## Stack
 
-- **Next.js 16** App Router, un único proceso (sin Express separado)
-- **React 19** + **TypeScript**
-- **Tailwind v4** + plugin `@tailwindcss/typography`
-- Primitivas estilo **shadcn/ui** (Radix UI debajo)
-- **lucide-react** para iconos
-- **react-dropzone** para upload del Word
-- **Vercel AI SDK** + `@openrouter/ai-sdk-provider` (instalados, no usados aún)
+| Capa | Tecnología |
+|------|-----------|
+| Framework | Next.js 16 (App Router, `output: standalone`) |
+| UI | React 19, Tailwind v4, Radix UI, lucide-react |
+| Formularios | react-hook-form + zod |
+| IA | Vercel AI SDK v6 + OpenRouter (`@openrouter/ai-sdk-provider`) |
+| Parser Word | mammoth + turndown + turndown-plugin-gfm |
+| Git | simple-git (clone con auth token) |
+| Auth | NextAuth v5 (Credentials, JWT) |
+| Markdown | react-markdown + remark-gfm |
+| Deploy | Docker (multi-stage, Node 20 Alpine) |
 
 ## Comandos
 
 ```bash
-npm install          # ya ejecutado durante el scaffold
+npm install
 npm run dev          # http://localhost:3000
-npm run build        # build de producción
+npm run build        # build de produccion
 npm run start        # servir el build
-```
-
-## Estructura
-
-```
-app/
-  layout.tsx                      # Providers + site header + footer
-  page.tsx                        # Landing + mode selector
-  new/page.tsx                    # Formulario Modo Nuevo
-  update/page.tsx                 # Formulario Modo Actualizar
-  progress/[jobId]/page.tsx       # Feed SSE de progreso
-  result/[jobId]/page.tsx         # Vista de resultado con Markdown
-  api/
-    jobs/route.ts                 # POST crear job
-    jobs/[jobId]/route.ts         # GET job meta
-    jobs/[jobId]/stream/route.ts  # GET SSE con eventos mock
-    upload/route.ts               # POST upload Word (stub)
-
-components/
-  ui/                             # Primitivas estilo shadcn
-  forms/                          # Formularios Modo Nuevo / Actualizar
-  progress/progress-stream.tsx    # Cliente SSE + render de eventos
-  result-view.tsx                 # Vista de resultado
-  site-header.tsx                 # Header con selector de idioma + tema
-
-lib/
-  i18n/                           # Provider + diccionarios ES / EN
-  jobs/                           # Store en memoria + tipos
-  sse/                            # Mock events + helper de encoding
-  ai/openrouter.ts                # STUB — Phase 2
-  agent/                          # STUB — tipos de tools + orquestador
-  gitea/                          # STUB — cliente REST + clone
-  parsers/                        # STUB — word + app.json
-  utils.ts                        # cn, sleep, id helpers
 ```
 
 ## Variables de entorno
 
-Copia `.env.local.example` a `.env.local`. En Fase 1 (mockup) **no son
-requeridas** — todo funciona sin ellas.
+Crea un fichero `.env.local` con las siguientes variables:
+
+```env
+# --- IA (obligatorio para agente real) ---
+OPENROUTER_API_KEY=sk-or-...
+MODEL=nvidia/nemotron-3-super-120b-a12b  # opcional, default: nvidia/nemotron-3-super-120b-a12b
+
+# --- Gitea (obligatorio para clone + wiki) ---
+GITEA_URL=https://git.example.com:3000
+GITEA_TOKEN=tu-token-personal
+
+# --- Auth ---
+AUTH_SECRET=un-secreto-aleatorio-largo
+AUTH_USERS=[{"email":"admin@example.com","password":"secret","name":"Admin"}]
+
+# --- Opcionales ---
+TEST_REPO_PATH=C:/repos/mi-proyecto-al  # dev: salta el clone, usa repo local
+GIT_SSL_NO_VERIFY=true                  # para certificados autofirmados
+TEMP_CLONE_DIR=/app/.tmp/repos          # directorio temporal de clones
+```
+
+Sin `OPENROUTER_API_KEY` la app funciona en modo demo con eventos simulados.
+
+## Estructura del proyecto
+
+```
+app/
+  page.tsx                          # Landing + selector de modo
+  login/page.tsx                    # Login (NextAuth)
+  new/page.tsx                      # Formulario Modo Nuevo
+  update/page.tsx                   # Formulario Modo Actualizar
+  select/[jobId]/page.tsx           # Selector de proyectos (workspace)
+  progress/[jobId]/page.tsx         # Feed SSE de progreso en tiempo real
+  result/[jobId]/page.tsx           # Vista del Markdown generado
+  api/
+    auth/[...nextauth]/route.ts     # NextAuth handler
+    jobs/route.ts                   # POST crear job (+ upload .docx)
+    jobs/[jobId]/route.ts           # GET metadata del job
+    jobs/[jobId]/stream/route.ts    # GET SSE streaming del agente
+    jobs/[jobId]/select/route.ts    # POST seleccion de proyectos
+
+lib/
+  ai/openrouter.ts                  # Cliente OpenRouter
+  agent/
+    run.ts                          # Orquestador del agente (streamText)
+    tools.ts                        # Herramientas: list_files, read_file, grep, read_app_json
+    prompts.ts                      # System + user prompts (Nuevo / Actualizar)
+    workspace.ts                    # Descubrimiento de proyectos AL
+    read-previous-doc.ts            # Herramienta de consulta del Word previo
+  auth.ts                           # Config NextAuth v5
+  gitea/
+    clone.ts                        # Clone con simple-git + token auth
+    api.ts                          # API REST Gitea v1 (metadata + wiki)
+  parsers/word.ts                   # .docx a Markdown (mammoth + turndown)
+  jobs/
+    store.ts                        # Store de jobs en memoria
+    types.ts                        # Tipos Job, JobEvent, JobMode, JobStatus
+  i18n/                             # Provider + diccionarios ES / EN
+  sse/                              # Encoder SSE + eventos mock (modo demo)
+
+middleware.ts                       # Proteccion de rutas (NextAuth)
+Dockerfile                          # Multi-stage build (Node 20 Alpine)
+docker-compose.yml                  # Servicio + volumen para clones
+```
+
+## Deploy con Docker
+
+```bash
+docker compose up --build -d
+```
+
+El `Dockerfile` genera un build standalone optimizado. Incluye `git` en la
+imagen para que `simple-git` pueda clonar repositorios. El volumen
+`clone-tmp` persiste los repos temporales entre reinicios.
+
+Para despliegues en plataformas como Dokploy, configura las variables de
+entorno en el panel y apunta al repositorio. Si tu instancia Gitea usa
+certificados autofirmados, anade `GIT_SSL_NO_VERIFY=true`.
 
 ## Roadmap
 
-- **Fase 1** ✅ Mockup visual navegable con SSE simulado
-- **Fase 2** Agente real con Vercel AI SDK + OpenRouter, clonado real con
-  `simple-git`, parser de Word con `mammoth`, publicación real en Wiki
-- **Fase 3** Historial de jobs persistente, auth básica, despliegue Hostinger + PM2
+- **Fase 1** -- Mockup visual navegable con SSE simulado
+- **Fase 2** -- Agente real con Vercel AI SDK, clone, parser Word, wiki
+- **Fase 3** -- Auth, Docker, deploy en Hostinger/Dokploy
+- **Fase 4** -- Historial de jobs persistente (Redis/DB), mejoras de UX
